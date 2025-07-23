@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hyperf74
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hyperf74
+  template:
+    metadata:
+      labels:
+        app: hyperf74
+    spec:
+      containers:
+        - name: hyperf74
+          image: docker.m.daocloud.io/hyperf/hyperf:7.4-alpine-v3.15-swoole
+#          imagePullPolicy: Never
+          command: ["sleep", "infinity"] # 让容器挂起不退出
+          ports:
+            - containerPort: 9501
+            - containerPort: 9502
+            - containerPort: 9503
+            - containerPort: 9504
+          volumeMounts:
+            - name: web-root
+              mountPath: /opt/www
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+      volumes:
+        - name: web-root
+          hostPath:
+            path: /opt/www
+      ## 原则上pod应该在worker节点，但是由于k8s集群的资源有限，可以手动将pod调度到master控制节点
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hyperf74-service
+spec:
+  selector:
+    app: hyperf74   # 必须与 Deployment 的 Pod 标签一致
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9501              # Service 的外部端口
+      targetPort: 9501      # Pod 的内部端口
+      nodePort: 30501       # 宿主机访问的端口
+    - name: tcp-1
+      protocol: TCP
+      port: 9502
+      targetPort: 9502
+      nodePort: 30502
+    - name: tcp-2
+      protocol: TCP
+      port: 9503
+      targetPort: 9503
+      nodePort: 30503
+    - name: tcp-3
+      protocol: TCP
+      port: 9504
+      targetPort: 9504
+      nodePort: 30504
+  type: NodePort

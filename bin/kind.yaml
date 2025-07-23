@@ -1,0 +1,57 @@
+# kind 配置文件，用于在 macOS 本地创建 Kubernetes 集群
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+# 集群名称（可选，默认为 kind）
+name: kind-cluster
+# 节点配置
+nodes:
+  # 控制平面节点（运行 Kubernetes 控制组件，如 API Server、Controller Manager 等）
+  - role: control-plane
+    # 指定 Kubernetes 版本，与你的环境兼容（v1.33.1）
+    image: kindest/node:v1.33.1
+    # 添加标签以启用 Ingress 控制器
+    labels:
+      ingress-ready: "true"
+    # 额外的挂载，用于同步主机时区（解决时间不一致问题）
+    extraMounts:
+      - hostPath: ./conf/AsiaShanghai
+        containerPath: /etc/localtime
+        readOnly: true
+      - hostPath: ./www
+        containerPath: /opt/www
+        readOnly: true
+    # 额外的端口映射，允许从主机访问集群服务
+    extraPortMappings:
+      # 映射主机端口 8080 到容器内 80 端口（用于测试 HTTP 服务）
+      - containerPort: 30501
+        hostPort: 30501
+        protocol: TCP
+      - containerPort: 30502
+        hostPort: 30502
+        protocol: TCP
+      - containerPort: 30503
+        hostPort: 30503
+        protocol: TCP
+      - containerPort: 30504
+        hostPort: 30504
+        protocol: TCP
+      - containerPort: 30401
+        hostPort: 30401
+        protocol: TCP
+  # 可选的工作节点（运行应用 Pod）。
+  # 控制节点默认有污点，原则上不允许运行Pod
+  # 本地32GB内存、或者学习时可以考虑开启
+#  - role: worker
+#    image: kindest/node:v1.33.1
+# 网络配置
+networking:
+  # 指定 Pod 网络 CIDR（默认即可，需与 CNI 插件兼容）
+  podSubnet: "10.244.0.0/16"
+  # 指定 Service 网络 CIDR
+  serviceSubnet: "10.96.0.0/12"
+  # 使用 kindnet 作为默认 CNI 插件（简单、适合开发）
+  disableDefaultCNI: false
+  # 设置 API Server 地址（默认即可，Podman 环境下通常为 0.0.0.0）
+  apiServerAddress: "0.0.0.0"
+  # 设置 API Server 端口（默认 6443）
+  apiServerPort: 6443
