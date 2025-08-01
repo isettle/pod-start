@@ -36,11 +36,11 @@ spec:
         - name: web-root
           hostPath:
             path: /opt/www
-      ## 原则上pod应该在worker节点，但是由于k8s集群的资源有限，可以手动将pod调度到master控制节点
-      tolerations:
-        - key: "node-role.kubernetes.io/control-plane"
-          operator: "Exists"
-          effect: "NoSchedule"
+#      ## 原则上pod应该在worker节点，但是由于k8s集群的资源有限，可以手动将pod调度到master控制节点
+#      tolerations:
+#        - key: "node-role.kubernetes.io/control-plane"
+#          operator: "Exists"
+#          effect: "NoSchedule"
 ---
 apiVersion: v1
 kind: Service

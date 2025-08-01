@@ -1,4 +1,5 @@
 # kind 配置文件，用于在 macOS 本地创建 Kubernetes 集群
+# 建议与podman、clima一起使用
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 # 集群名称（可选，默认为 kind）
@@ -39,10 +40,10 @@ nodes:
         hostPort: 30401
         protocol: TCP
   # 可选的工作节点（运行应用 Pod）。
-  # 控制节点默认有污点，原则上不允许运行Pod
+  # 控制节点默认有污点，原则上不允许运行业务Pod，防止控制面节点“蓝屏”
   # 本地32GB内存、或者学习时可以考虑开启
-#  - role: worker
-#    image: kindest/node:v1.33.1
+  - role: worker
+    image: kindest/node:v1.33.1
 # 网络配置
 networking:
   # 指定 Pod 网络 CIDR（默认即可，需与 CNI 插件兼容）
