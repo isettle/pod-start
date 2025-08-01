@@ -1,5 +1,5 @@
 # kind 配置文件，用于在 macOS 本地创建 Kubernetes 集群
-# 建议与podman、clima一起使用
+# 建议与podman/clima一起使用
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 # 集群名称（可选，默认为 kind）
